@@ -1,4 +1,4 @@
-import { TouchableOpacity, View, Text } from "react-native";
+import { StyleSheet, TouchableOpacity, View, Text } from "react-native";
 import { h, makeComponent } from "@cycle/react";
 
 const main = function(sources) {
@@ -8,8 +8,10 @@ const main = function(sources) {
   const count$ = inc$.fold(count => count + 1, 0);
 
   const elem$ = count$.map(i =>
-    h(TouchableOpacity, { sel: inc }, [
-      h(View, [h(Text, {}, `\n\n\n\nCounter: ${i}`)])
+    h(TouchableOpacity, { sel: inc, style: styles.container }, [
+      h(View, { style: styles.container }, [
+        h(Text, { style: styles.text }, `Counter: ${i}`)
+      ])
     ])
   );
 
@@ -19,5 +21,17 @@ const main = function(sources) {
 };
 
 const App = makeComponent(main);
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center"
+  },
+  text: {
+    fontWeight: "bold"
+  }
+});
 
 export default App;
