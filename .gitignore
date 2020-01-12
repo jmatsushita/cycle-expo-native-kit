@@ -5,3 +5,4 @@ ios/build
 */.idea
 */.gradle
 android/app/build
+.expo
