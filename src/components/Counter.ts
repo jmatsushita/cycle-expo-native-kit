@@ -8,17 +8,17 @@ export type CounterProps = {
 };
 
 export type Sources = {
-  interface: ReactSource;
+  react: ReactSource;
   props$: Stream<CounterProps>;
 };
 export type Sinks = {
-  interface: Stream<ReactElement<any>>;
+  react: Stream<ReactElement<any>>;
   count$: MemoryStream<number>;
 };
 
 function Counter(sources: Sources): Sinks {
   const inc = Symbol();
-  const inc$ = sources.interface.select(inc).events("press");
+  const inc$ = sources.react.select(inc).events("press");
 
   const count$ = inc$.fold(count => count + 1, 0);
 
@@ -29,7 +29,7 @@ function Counter(sources: Sources): Sinks {
   );
 
   return {
-    interface: elem$,
+    react: elem$,
     count$
   };
 }

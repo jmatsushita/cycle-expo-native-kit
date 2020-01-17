@@ -4,16 +4,21 @@ import { h, ReactSource } from "@cycle/react";
 import isolate from "@cycle/isolate";
 import Counter from "../components/Counter";
 
+import { Link } from "../routing";
+
 import { StyleSheet, View, Text } from "react-native";
 
 export type Sources = {
-  interface: ReactSource;
+  react: ReactSource;
 };
+
 export type Sinks = {
-  interface: Stream<ReactElement<any>>;
+  react: Stream<ReactElement<any>>;
 };
 
 function Home(sources: Sources): Sinks {
+  const location$ = sources.react._props$;
+
   const TopCounter = isolate(Counter) as typeof Counter;
   const BottomCounter = isolate(Counter) as typeof Counter;
 
@@ -22,6 +27,7 @@ function Home(sources: Sources): Sinks {
       label: "Top"
     })
     .remember();
+
   const bottomProps$ = xs
     .of({
       label: "Bottom"
@@ -29,11 +35,11 @@ function Home(sources: Sources): Sinks {
     .remember();
 
   const topCounter = TopCounter({
-    interface: sources.interface,
+    react: sources.react,
     props$: topProps$
   });
   const bottomCounter = BottomCounter({
-    interface: sources.interface,
+    react: sources.react,
     props$: bottomProps$
   });
 
@@ -47,17 +53,23 @@ function Home(sources: Sources): Sinks {
 
   // View combines component DOM.
   const screen$ = xs
-    .combine(sum$, topCounter.interface, bottomCounter.interface)
-    .map(([bmi, topVTree, bottomVTree]) =>
+    .combine(location$, sum$, topCounter.react, bottomCounter.react)
+    .map(([{ location: { pathname } }, bmi, topVTree, bottomVTree]) =>
       h(View, { style: styles.container }, [
         topVTree,
         bottomVTree,
-        h(Text, { style: styles.container }, "Sum is " + bmi)
+        h(Text, { style: styles.container }, "Sum is " + bmi),
+        h(View, { style: styles.container }, [
+          h(Text, {}, ["Current path: " + pathname]),
+          h(Link, { to: "/" }, [
+            h(Text, { style: { textDecorationLine: "underline" } }, "Welcome")
+          ])
+        ])
       ])
     );
 
   return {
-    interface: screen$
+    react: screen$
   };
 }
 
